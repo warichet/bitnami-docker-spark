@@ -28,5 +28,21 @@ if [[ "$*" = "/opt/bitnami/scripts/spark/run.sh" ]]; then
     info "** Spark setup finished! **"
 fi
 
+case "$1" in
+  driver)
+    shift 1
+    CMD=(
+      "$SPARK_HOME/bin/spark-submit"
+      --conf "spark.driver.bindAddress=$SPARK_DRIVER_BIND_ADDRESS"
+      --deploy-mode client
+      "$@"
+    )
+    ;;
+  *)
+    echo "Non-spark-on-k8s command provided, proceeding in pass-through mode..."
+    CMD=("$@")
+    ;;
+esac
+
 echo ""
-exec "$@"
+exec "${CMD[@]}"
